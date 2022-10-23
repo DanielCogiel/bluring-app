@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32413.511
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlurClient", "BlurClient\BlurClient.vcxproj", "{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{114F1756-91A4-4294-AAC1-B0EF00436059} = {114F1756-91A4-4294-AAC1-B0EF00436059}
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D} = {74938EAF-D3BA-406C-AE6D-C93211BE606D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlurCDll", "BlurCDll\BlurCDll.vcxproj", "{74938EAF-D3BA-406C-AE6D-C93211BE606D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlurAsmDll", "BlurAsmDll\BlurAsmDll.vcxproj", "{114F1756-91A4-4294-AAC1-B0EF00436059}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Debug|x64.ActiveCfg = Debug|x64
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Debug|x64.Build.0 = Debug|x64
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Debug|x86.ActiveCfg = Debug|Win32
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Debug|x86.Build.0 = Debug|Win32
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Release|x64.ActiveCfg = Release|x64
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Release|x64.Build.0 = Release|x64
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Release|x86.ActiveCfg = Release|Win32
+		{CFFB31AD-B6AA-429B-8994-448CBD43B7CD}.Release|x86.Build.0 = Release|Win32
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Debug|x64.ActiveCfg = Debug|x64
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Debug|x64.Build.0 = Debug|x64
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Debug|x86.ActiveCfg = Debug|Win32
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Debug|x86.Build.0 = Debug|Win32
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Release|x64.ActiveCfg = Release|x64
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Release|x64.Build.0 = Release|x64
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Release|x86.ActiveCfg = Release|Win32
+		{74938EAF-D3BA-406C-AE6D-C93211BE606D}.Release|x86.Build.0 = Release|Win32
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Debug|x64.ActiveCfg = Debug|x64
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Debug|x64.Build.0 = Debug|x64
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Debug|x86.ActiveCfg = Debug|Win32
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Debug|x86.Build.0 = Debug|Win32
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Release|x64.ActiveCfg = Release|x64
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Release|x64.Build.0 = Release|x64
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Release|x86.ActiveCfg = Release|Win32
+		{114F1756-91A4-4294-AAC1-B0EF00436059}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {30841B2A-CB2D-4DA3-AB65-A379A5AFAFE7}
+	EndGlobalSection
+EndGlobal
