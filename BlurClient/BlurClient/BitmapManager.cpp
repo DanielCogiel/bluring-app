@@ -91,9 +91,9 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
     if (!choice) {
         if (NULL != this->handleToAsmBlur) {
             for (int i = 0; i < threadNumber; i++) //Utwórz tyle w¹tków, ile zosta³o podane
-                threads.push_back(std::thread([this, bytesPerRow, i](int elem1, int elem2) {
-                this->handleToAsmBlur(this->imageData + i * bytesPerRow, elem1);
-                    }, 3, 5));
+                threads.push_back(std::thread([this, bytesPerRow, i]() {
+                this->handleToAsmBlur(this->imageData + i * bytesPerRow, bytesPerRow, 1);
+                    }));
             for (auto& t : threads) //Zaczekaj, a¿ wszystkie w¹tki zakoñcz¹ pracê
                 t.join();
         }

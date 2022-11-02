@@ -9,7 +9,7 @@ int main()
   //  MyManager.printImageOnConsole();
     std::cout << "Before proc: " << std::endl;
     MyManager.printBytes(30);
-    MyManager.runBlur(10, false);
+    MyManager.runBlur(1, false);
     std::cout << "After proc: " << std::endl;
     MyManager.printBytes(30);
 

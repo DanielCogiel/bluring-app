@@ -8,7 +8,7 @@
 #include <thread>
 
 typedef int(__cdecl* MYPROC)(DWORD, DWORD);
-typedef int(__cdecl* ASM_PROC)(unsigned char*, DWORD);
+typedef int(__cdecl* ASM_PROC)(unsigned char*, DWORD, DWORD); //(imageData, bytesPerRow, linesToProcess)
 
 class BitmapManager {
 public:
