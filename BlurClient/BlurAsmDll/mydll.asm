@@ -7,6 +7,16 @@
 ; where to put your own functions in the DLL
 ;-------------------------------------------------------------------------
 
+BlurProc proc 
+	mov al, 0
+	mov byte ptr [rcx], al
+	inc rcx
+	mov byte ptr [rcx], al
+	inc rcx
+	mov byte ptr [rcx], al
+	ret
+BlurProc endp 
+
 MyProc1 proc x: DWORD, y: DWORD
 
 ;xor	eax,eax
@@ -22,7 +32,7 @@ MyProc1 proc x: DWORD, y: DWORD
 ;Neg	y
 ;ret
 
-mov rax, 20
+mov rax, 15
 ret
 
 MyProc1 endp

@@ -7,7 +7,11 @@ int main()
 {
     BitmapManager MyManager("land2.bmp");
   //  MyManager.printImageOnConsole();
-    MyManager.runBlur(10, true);
+    std::cout << "Before proc: " << std::endl;
+    MyManager.printBytes(30);
+    MyManager.runBlur(10, false);
+    std::cout << "After proc: " << std::endl;
+    MyManager.printBytes(30);
 
     std::cout << std::endl << "------------------------------------" << std::endl;
 

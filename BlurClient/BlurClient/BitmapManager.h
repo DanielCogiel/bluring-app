@@ -7,8 +7,8 @@
 #include <vector>
 #include <thread>
 
-typedef int(_stdcall* ASM_PROC)(DWORD, DWORD);
-typedef int(__cdecl* C_FUNC)(DWORD, DWORD);
+typedef int(__cdecl* MYPROC)(DWORD, DWORD);
+typedef int(__cdecl* ASM_PROC)(unsigned char*, DWORD);
 
 class BitmapManager {
 public:
@@ -18,13 +18,14 @@ public:
 	unsigned char* imageData;
 	HINSTANCE hinstLibC;
 	HINSTANCE hinstLibAsm;
-	C_FUNC handleToCBlur;
+	MYPROC handleToCBlur;
 	ASM_PROC handleToAsmBlur;
 
 	void loadBMP(const char* filename);
 public:
 	BitmapManager(const char* filename);
 	void printImageOnConsole();
+	void printBytes(int numberOfBytes);
 	void runBlur(int threadNumber, bool choice);
 	~BitmapManager();
 };

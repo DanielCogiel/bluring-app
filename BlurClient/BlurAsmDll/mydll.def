@@ -1,2 +1,4 @@
 LIBRARY 
-EXPORTS MyProc1
+EXPORTS
+MyProc1
+BlurProc

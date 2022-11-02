@@ -35,10 +35,10 @@ BitmapManager::BitmapManager(const char* filename)
 
     //Jeœli uchwyt wskazuje na bibliotekê, wygeneruj uchwyt do odpowiedniej procedury
     if (this->hinstLibAsm != NULL) {  
-        this->handleToAsmBlur = (ASM_PROC)GetProcAddress(this->hinstLibAsm, "MyProc1");
+        this->handleToAsmBlur = (ASM_PROC)GetProcAddress(this->hinstLibAsm, "BlurProc");
     }
     if (this->hinstLibC != NULL) {
-        this->handleToCBlur = (C_FUNC)GetProcAddress(this->hinstLibC, "MyFunc");
+        this->handleToCBlur = (MYPROC)GetProcAddress(this->hinstLibC, "MyFunc");
     }
    
 }
@@ -70,16 +70,29 @@ void BitmapManager::printImageOnConsole()
     std::cout << "========================================================" << std::endl;
 }
 
+void BitmapManager::printBytes(int numberOfBytes)
+{
+    std::cout << "First " << numberOfBytes << " bytes:" << std::endl;
+    for (int i = 0; i < numberOfBytes; i++) {
+        std::cout << float(this->imageData[i]) << " ";
+    }
+    std::cout << std::endl;
+}
+
+
+
 void BitmapManager::runBlur(int threadNumber, bool choice)
 {
     std::vector<std::thread> threads;
+
+    auto bytesPerRow = this->infoHeader.biSizeImage / this->infoHeader.biHeight;
 
     //W zale¿noœci od wyboru u¿yj odpowiedniego uchwytu procedury
     if (!choice) {
         if (NULL != this->handleToAsmBlur) {
             for (int i = 0; i < threadNumber; i++) //Utwórz tyle w¹tków, ile zosta³o podane
-                threads.push_back(std::thread([this](int elem1, int elem2) {
-                std::cout << this->handleToAsmBlur(elem1, elem2) << " ";
+                threads.push_back(std::thread([this, bytesPerRow, i](int elem1, int elem2) {
+                this->handleToAsmBlur(this->imageData + i * bytesPerRow, elem1);
                     }, 3, 5));
             for (auto& t : threads) //Zaczekaj, a¿ wszystkie w¹tki zakoñcz¹ pracê
                 t.join();
