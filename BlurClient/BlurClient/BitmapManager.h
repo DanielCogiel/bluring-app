@@ -8,7 +8,7 @@
 #include <thread>
 
 typedef int(__cdecl* MYPROC)(DWORD, DWORD);
-typedef int(__cdecl* ASM_PROC)(unsigned char*, DWORD, DWORD); //(imageData, bytesPerRow, linesToProcess)
+typedef int(__cdecl* ASM_PROC)(unsigned char*, unsigned char*, DWORD, DWORD); //(imageData, bytesPerRow, linesToProcess)
 
 class BitmapManager {
 public:
@@ -16,6 +16,7 @@ public:
 	BitmapInfoHeader infoHeader;
 	bool isFileLoaded;
 	unsigned char* imageData;
+	unsigned char* blurredImageData;
 	HINSTANCE hinstLibC;
 	HINSTANCE hinstLibAsm;
 	MYPROC handleToCBlur;
@@ -25,7 +26,7 @@ public:
 public:
 	BitmapManager(const char* filename);
 	void printImageOnConsole();
-	void printBytes(int numberOfBytes);
+	void printBytes(int numberOfBytes, bool choice);
 	void runBlur(int threadNumber, bool choice);
 	~BitmapManager();
 };

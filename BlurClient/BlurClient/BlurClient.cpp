@@ -8,11 +8,10 @@ int main()
     BitmapManager MyManager("land2.bmp");
   //  MyManager.printImageOnConsole();
     std::cout << "Before proc: " << std::endl;
-    MyManager.printBytes(30);
+    std::cout << "Original image" << std::endl;
+    MyManager.printBytes(12, false);
     MyManager.runBlur(1, false);
     std::cout << "After proc: " << std::endl;
-    MyManager.printBytes(30);
-
-    std::cout << std::endl << "------------------------------------" << std::endl;
-
+    std::cout << "Blurred image" << std::endl;
+    MyManager.printBytes(4, true);
 }

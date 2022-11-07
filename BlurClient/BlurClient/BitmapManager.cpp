@@ -22,6 +22,7 @@ void BitmapManager::loadBMP(const char* filename)
     fread(imageData1, sizeof(unsigned char), dataSize, file);
 
     this->imageData = imageData1;
+    this->blurredImageData = new unsigned char[dataSize];
 }
 
 BitmapManager::BitmapManager(const char* filename)
@@ -70,11 +71,18 @@ void BitmapManager::printImageOnConsole()
     std::cout << "========================================================" << std::endl;
 }
 
-void BitmapManager::printBytes(int numberOfBytes)
+void BitmapManager::printBytes(int numberOfBytes, bool choice)
 {
     std::cout << "First " << numberOfBytes << " bytes:" << std::endl;
-    for (int i = 0; i < numberOfBytes; i++) {
-        std::cout << float(this->imageData[i]) << " ";
+    if (!choice) {
+        for (int i = 0; i < numberOfBytes; i++) {
+            std::cout << float(this->imageData[i]) << " ";
+        }
+    }
+    else {
+        for (int i = 0; i < numberOfBytes; i++) {
+            std::cout << float(this->blurredImageData[i]) << " ";
+        }
     }
     std::cout << std::endl;
 }
@@ -92,7 +100,8 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
         if (NULL != this->handleToAsmBlur) {
             for (int i = 0; i < threadNumber; i++) //Utwórz tyle w¹tków, ile zosta³o podane
                 threads.push_back(std::thread([this, bytesPerRow, i]() {
-                this->handleToAsmBlur(this->imageData + i * bytesPerRow, bytesPerRow, 1);
+                this->handleToAsmBlur(this->imageData + i * bytesPerRow,
+                    this->blurredImageData + i * bytesPerRow, bytesPerRow, 1);
                     }));
             for (auto& t : threads) //Zaczekaj, a¿ wszystkie w¹tki zakoñcz¹ pracê
                 t.join();
@@ -122,4 +131,5 @@ BitmapManager::~BitmapManager()
     FreeLibrary(this->hinstLibAsm);
     FreeLibrary(this->hinstLibC); 
     delete[] this->imageData;
+    delete[] this->blurredImageData;
 }
