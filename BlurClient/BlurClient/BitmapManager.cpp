@@ -55,8 +55,10 @@ void BitmapManager::printImageOnConsole()
     //Wypisz ca³y obraz
     for (int y = 0; y < this->infoHeader.biSizeImage; y += bytesPerRow) {
         for (int x = 0; x < bytesPerRow; x++) {
+       //     if (int(*(this->imageData + x)) != 0) {
             std::cout << std::setw(3) << int(*(this->imageData + x));
             std::cout << " ";
+       //     }
         }
         std::cout << std::endl;
     }
@@ -93,18 +95,45 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
 {
     std::vector<std::thread> threads;
 
-    auto bytesPerRow = this->infoHeader.biSizeImage / this->infoHeader.biHeight;
+    if (threadNumber > this->infoHeader.biHeight)
+        threadNumber = this->infoHeader.biHeight;
 
+    int linesPerThread = this->infoHeader.biHeight / threadNumber;
+    int moduloCounter = this->infoHeader.biHeight % threadNumber;
+ //   std::cout << linesPerThread << std::endl;
+ //   std::cout << "Modulo: " << moduloCounter << std::endl;
+
+    auto bytesPerRow = this->infoHeader.biSizeImage / this->infoHeader.biHeight;
     //W zale¿noœci od wyboru u¿yj odpowiedniego uchwytu procedury
     if (!choice) {
         if (NULL != this->handleToAsmBlur) {
-            for (int i = 0; i < threadNumber; i++) //Utwórz tyle w¹tków, ile zosta³o podane
-                threads.push_back(std::thread([this, bytesPerRow, i]() {
-                this->handleToAsmBlur(this->imageData + i * bytesPerRow,
-                    this->blurredImageData + i * bytesPerRow, bytesPerRow, 1);
+            for (int i = 0; i < moduloCounter; i++) {
+                threads.push_back(std::thread([this, i, linesPerThread, bytesPerRow]() {
+                    this->handleToAsmBlur(this->imageData + i * (linesPerThread + 1) * bytesPerRow,
+                        this->blurredImageData + i * (linesPerThread + 1) * bytesPerRow,
+                        bytesPerRow, linesPerThread + 1);
+              //      std::cout << i * (linesPerThread + 1) * bytesPerRow << std::endl;
+                    }));
+            }
+
+            int moduloShift = moduloCounter * (linesPerThread + 1) * bytesPerRow;
+
+            for (int i = 0; i < threadNumber - moduloCounter; i++) //Utwórz tyle w¹tków, ile zosta³o podane
+                threads.push_back(std::thread([this, bytesPerRow, i, linesPerThread, moduloShift]() {
+                this->handleToAsmBlur(this->imageData + moduloShift + i * linesPerThread * bytesPerRow,
+                    this->blurredImageData + moduloShift + i * linesPerThread * bytesPerRow,
+                    bytesPerRow, linesPerThread);
                     }));
             for (auto& t : threads) //Zaczekaj, a¿ wszystkie w¹tki zakoñcz¹ pracê
                 t.join();
+
+            //for (int i = 0; i < threadNumber; i++) //Utwórz tyle w¹tków, ile zosta³o podane
+            //    threads.push_back(std::thread([this, bytesPerRow, i, linesPerThread]() {
+            //    this->handleToAsmBlur(this->imageData + i * bytesPerRow,
+            //        this->blurredImageData + i * bytesPerRow, bytesPerRow, linesPerThread);
+            //        }));
+            //for (auto& t : threads) //Zaczekaj, a¿ wszystkie w¹tki zakoñcz¹ pracê
+            //    t.join();
         }
         else {
             std::cout << "Error: Have not found the proper function." << std::endl;
