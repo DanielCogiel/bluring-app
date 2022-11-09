@@ -56,7 +56,7 @@ void BitmapManager::printImageOnConsole()
     for (int y = 0; y < this->infoHeader.biSizeImage; y += bytesPerRow) {
         for (int x = 0; x < bytesPerRow; x++) {
        //     if (int(*(this->imageData + x)) != 0) {
-            std::cout << std::setw(3) << int(*(this->imageData + x));
+            std::cout << std::setw(3) << float(*(this->imageData + x));
             std::cout << " ";
        //     }
         }
