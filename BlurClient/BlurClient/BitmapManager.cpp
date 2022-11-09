@@ -154,6 +154,17 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
     }
 }
 
+void BitmapManager::exportImage(const char * filename)
+{
+    FILE* outputFile = fopen(filename, "w");
+    if (!outputFile)
+        return;
+    auto dataSize = this->infoHeader.biSizeImage;
+    fwrite(&(this->fileHeader), sizeof(BitmapFileHeader), 1, outputFile);
+    fwrite(&(this->infoHeader), sizeof(BitmapInfoHeader), 1, outputFile);
+    fwrite(this->blurredImageData, sizeof(unsigned char), dataSize, outputFile);
+}
+
 BitmapManager::~BitmapManager()
 {
     //Zwolnij uchwyty do bibliotek

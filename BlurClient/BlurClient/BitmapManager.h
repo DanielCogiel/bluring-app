@@ -28,6 +28,7 @@ public:
 	void printImageOnConsole();
 	void printBytes(int numberOfBytes, bool choice);
 	void runBlur(int threadNumber, bool choice);
+	void exportImage(const char* filename);
 	~BitmapManager();
 };
 
