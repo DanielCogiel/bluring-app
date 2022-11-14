@@ -7,7 +7,7 @@
 #include <vector>
 #include <thread>
 
-typedef int(__cdecl* MYPROC)(DWORD, DWORD);
+typedef int(__cdecl* MYPROC)(unsigned char*, unsigned char*, DWORD, DWORD);
 typedef int(__cdecl* ASM_PROC)(unsigned char*, unsigned char*, DWORD, DWORD); //(imageData, bytesPerRow, linesToProcess)
 
 class BitmapManager {
@@ -28,6 +28,7 @@ public:
 	void printImageOnConsole();
 	void printBytes(int numberOfBytes, bool choice);
 	void runBlur(int threadNumber, bool choice);
+	void TestLoading(int threadNumber);
 	void exportImage(const char* filename);
 	~BitmapManager();
 };

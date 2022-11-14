@@ -5,15 +5,19 @@
 
 int main()
 {
-    BitmapManager MyManager("land.BMP");
-  //  MyManager.printImageOnConsole();
-    std::cout << "Before proc: " << std::endl;
-    std::cout << "Original image" << std::endl;
-    MyManager.printBytes(24, false);
-    MyManager.runBlur(1, false);
-    std::cout << "After proc: " << std::endl;
-    std::cout << "Blurred image" << std::endl;
-    MyManager.printBytes(24, true);
-  //  MyManager.printImageOnConsole();
-    MyManager.exportImage("output.bmp");
+    BitmapManager MyManager("land2.bmp");
+
+    //std::cout << "Before proc: " << std::endl;
+    //std::cout << "Original image" << std::endl;
+    //MyManager.printBytes(24, false);
+
+    //MyManager.runBlur(64, false);
+
+    //std::cout << "After proc: " << std::endl;
+    //std::cout << "Blurred image" << std::endl;
+    //MyManager.printBytes(24, true);
+
+    //MyManager.exportImage("output.bmp");
+
+    MyManager.TestLoading(64);
 }
