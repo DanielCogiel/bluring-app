@@ -21,7 +21,7 @@ public:
 	HINSTANCE hinstLibAsm;
 	MYPROC handleToCBlur;
 	ASM_PROC handleToAsmBlur;
-
+public: //Potem zmieniæ na private
 	void loadBMP(const char* filename);
 public:
 	BitmapManager(const char* filename);
