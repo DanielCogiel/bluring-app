@@ -124,7 +124,7 @@ RowLoop:
 	paddd xmm0, xmm1
 	mov eax, dword ptr [r14+8]
 	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
+	pmovzxbd xmm1, xmm1 ;To mo¿na od razu wczytaæ do xmm1
 	paddd xmm0, xmm1
 	
 	pmulld xmm0, xmm6			;perform divide by 5 on xmm0's dwords (multiply dwords by 2^4 / 5 = 3)
