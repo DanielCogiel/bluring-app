@@ -25,8 +25,8 @@ int main()
     //std::cout << "Before proc: " << std::endl;
     //std::cout << "Original image" << std::endl;
     //MyManager.printBytes(24, false);
-    MyManager.TestLoading(1);
-    MyManager.runBlur(64, false);
+  //  MyManager.TestLoading(1);
+    MyManager.runBlur(1, true);
 
     //std::cout << "After proc: " << std::endl;
     //std::cout << "Blurred image" << std::endl;

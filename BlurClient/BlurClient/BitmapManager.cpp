@@ -107,6 +107,10 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
     auto bytesPerRow = this->infoHeader.biSizeImage / this->infoHeader.biHeight;
     //W zale¿noœci od wyboru u¿yj odpowiedniego uchwytu procedury
         if (NULL != this->handleToAsmBlur) {
+            /*this->handleToAsmBlur(this->imageData, this->blurredImageData,
+               this->infoHeader.biSizeImage, 0);*/
+       //     this->handleToCBlur(this->imageData, this->blurredImageData, this->infoHeader.biSizeImage, 0);
+
             for (int i = 0; i < moduloCounter; i++) {
                 threads.push_back(std::thread([this, i, linesPerThread, bytesPerRow, choice]() {
                     if (!choice) {
@@ -122,9 +126,9 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
               //      std::cout << i * (linesPerThread + 1) * bytesPerRow << std::endl;
                     }));
             }
-
+            
             int moduloShift = moduloCounter * (linesPerThread + 1) * bytesPerRow;
-
+            
             for (int i = 0; i < threadNumber - moduloCounter; i++) //Utwórz tyle w¹tków, ile zosta³o podane
                 threads.push_back(std::thread([this, bytesPerRow, i, linesPerThread, moduloShift, choice]() {
                 if (!choice) {
@@ -138,10 +142,12 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
                         bytesPerRow, linesPerThread);
                 }
                     }));
-
+            
             for (auto& t : threads) //Zaczekaj, a¿ wszystkie w¹tki zakoñcz¹ pracê
                 t.join();
 
+
+            //-----------------------
             //for (int i = 0; i < threadNumber; i++) //Utwórz tyle w¹tków, ile zosta³o podane
             //    threads.push_back(std::thread([this, bytesPerRow, i, linesPerThread]() {
             //    this->handleToAsmBlur(this->imageData + i * bytesPerRow,
@@ -149,6 +155,7 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
             //        }));
             //for (auto& t : threads) //Zaczekaj, a¿ wszystkie w¹tki zakoñcz¹ pracê
             //    t.join();
+            //-----------------------
         }
         else {
             std::cout << "Error: Have not found the proper function." << std::endl;
