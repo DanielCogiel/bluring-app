@@ -274,6 +274,7 @@ void BitmapManager::exportImage(const char * filename)
     auto dataSize = this->infoHeader.biSizeImage;
     fwrite(&(this->fileHeader), sizeof(BitmapFileHeader), 1, outputFile);
     fwrite(&(this->infoHeader), sizeof(BitmapInfoHeader), 1, outputFile);
+    fseek(outputFile, this->fileHeader.bfOffBits, SEEK_SET);
     fwrite(this->blurredImageData, sizeof(unsigned char), dataSize, outputFile);
 }
 
