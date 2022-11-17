@@ -268,7 +268,7 @@ void BitmapManager::TestLoading(int threadNumber)
 
 void BitmapManager::exportImage(const char * filename)
 {
-    FILE* outputFile = fopen(filename, "w");
+    FILE* outputFile = fopen(filename, "wb");
     if (!outputFile)
         return;
     auto dataSize = this->infoHeader.biSizeImage;
