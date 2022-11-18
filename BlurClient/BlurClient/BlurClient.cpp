@@ -5,7 +5,7 @@
 
 int main()
 {
-    BitmapManager MyManager("land.bmp");
+    BitmapManager MyManager("small.bmp");
 
    /* auto start = std::chrono::high_resolution_clock::now();
     MyManager.runBlur(1, false);
@@ -26,7 +26,7 @@ int main()
     //std::cout << "Original image" << std::endl;
     //MyManager.printBytes(24, false);
   //  MyManager.TestLoading(1);
-    MyManager.runBlur(1, false);
+    MyManager.runBlur(1, true);
 
     //std::cout << "After proc: " << std::endl;
     //std::cout << "Blurred image" << std::endl;
