@@ -27,12 +27,12 @@ int main()
     //std::cout << "Original image" << std::endl;
     //MyManager.printBytes(24, false);
   //  MyManager.TestLoading(1);
-    MyManager.runBlur(64, true);
+    MyManager.runBlur(64, false);
     //std::cout << "After proc: " << std::endl;
     //std::cout << "Blurred image" << std::endl;
     //MyManager.printBytes(24, true);
 
-    MyManager.exportImage("outputC.bmp");
+    MyManager.exportImage("outputVSCODE2022.bmp");
 
     //MyManager.TestLoading(64);
 }
