@@ -2,7 +2,9 @@
 
 void BitmapManager::loadBMP(const char* filename)
 {
-    
+    delete[] this->imageData;
+    delete[] this->blurredImageData;
+
     //Otwórz plik
     FILE* file = fopen(filename, "rb");
     if (!file) {

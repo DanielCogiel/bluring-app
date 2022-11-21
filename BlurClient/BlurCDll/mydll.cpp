@@ -7,8 +7,8 @@ void BlurProc(unsigned char* origImage, unsigned char* blurredImage,
     DWORD bytesPerThread) {
 
     for (int i = 0; i < bytesPerThread; i++) {
-        blurredImage[i] = (origImage[i] + origImage[i - 3] + origImage[i - 6]
-            + origImage[i + 3] + origImage[i + 6]) / 5;
+        blurredImage[i] = ((origImage[i] + origImage[i - 3] + origImage[i - 6]
+            + origImage[i + 3] + origImage[i + 6]) * 3 + 3) >> 4;
     }
 
 
