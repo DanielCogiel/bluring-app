@@ -14,7 +14,6 @@ class BitmapManager {
 public:
 	BitmapFileHeader fileHeader;
 	BitmapInfoHeader infoHeader;
-	bool isFileLoaded;
 	unsigned char* imageData;
 	unsigned char* blurredImageData;
 	HINSTANCE hinstLibC;
@@ -22,6 +21,7 @@ public:
 	MYPROC handleToCBlur;
 	ASM_PROC handleToAsmBlur;
 public: 
+	bool isFileLoaded;
 	void loadBMP(const char* filename);
 	BitmapManager();
 	void printImageOnConsole();

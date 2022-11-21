@@ -1,5 +1,7 @@
 #pragma once
 #include "BitmapManager.h";
+#include <atlstr.h>
+
 
 namespace BlurApp {
 
@@ -9,6 +11,8 @@ namespace BlurApp {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Runtime::InteropServices;
+
 
 	/// <summary>
 	/// Podsumowanie informacji o BlurForm
@@ -29,6 +33,8 @@ namespace BlurApp {
 			//this->blurManager->loadBMP("land2.bmp");
 			//this->blurManager->runBlur(64, true);
 			//this->blurManager->exportImage("TESTFORM.bmp");
+
+			this->blurManager = new BitmapManager();
 		}
 
 	protected:
@@ -42,16 +48,25 @@ namespace BlurApp {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::TrackBar^ trackBar1;
+	private: System::Windows::Forms::TrackBar^ threadNumberTrackbar;
+	protected:
+
 	private: System::Windows::Forms::Label^ label1;
-	private: System::Windows::Forms::Button^ button1;
-	private: System::Windows::Forms::RadioButton^ radioButton1;
-	private: System::Windows::Forms::GroupBox^ groupBox1;
-	private: System::Windows::Forms::RadioButton^ radioButton2;
-	private: System::Windows::Forms::PictureBox^ pictureBox1;
-	private: System::Windows::Forms::PictureBox^ pictureBox2;
+	private: System::Windows::Forms::Button^ blurButton;
+	private: System::Windows::Forms::RadioButton^ asmRadioButton;
+
+
+	private: System::Windows::Forms::GroupBox^ chooseDllGroupBox;
+	private: System::Windows::Forms::RadioButton^ cRadioButton;
+	private: System::Windows::Forms::PictureBox^ originalImagePictureBox;
+	private: System::Windows::Forms::PictureBox^ blurredImagePictureBox;
+
+
+
+
 	private: System::Windows::Forms::OpenFileDialog^ FileDialog;
 	private: System::Windows::Forms::Button^ chooseImageButton;
+	private: System::Windows::Forms::Label^ threadNumberLabel;
 
 
 	protected:
@@ -69,38 +84,43 @@ namespace BlurApp {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->button1 = (gcnew System::Windows::Forms::Button());
-			this->trackBar1 = (gcnew System::Windows::Forms::TrackBar());
+			this->blurButton = (gcnew System::Windows::Forms::Button());
+			this->threadNumberTrackbar = (gcnew System::Windows::Forms::TrackBar());
 			this->label1 = (gcnew System::Windows::Forms::Label());
-			this->radioButton1 = (gcnew System::Windows::Forms::RadioButton());
-			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
-			this->radioButton2 = (gcnew System::Windows::Forms::RadioButton());
-			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
-			this->pictureBox2 = (gcnew System::Windows::Forms::PictureBox());
+			this->asmRadioButton = (gcnew System::Windows::Forms::RadioButton());
+			this->chooseDllGroupBox = (gcnew System::Windows::Forms::GroupBox());
+			this->cRadioButton = (gcnew System::Windows::Forms::RadioButton());
+			this->originalImagePictureBox = (gcnew System::Windows::Forms::PictureBox());
+			this->blurredImagePictureBox = (gcnew System::Windows::Forms::PictureBox());
 			this->FileDialog = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->chooseImageButton = (gcnew System::Windows::Forms::Button());
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar1))->BeginInit();
-			this->groupBox1->SuspendLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
+			this->threadNumberLabel = (gcnew System::Windows::Forms::Label());
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->threadNumberTrackbar))->BeginInit();
+			this->chooseDllGroupBox->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->originalImagePictureBox))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->blurredImagePictureBox))->BeginInit();
 			this->SuspendLayout();
 			// 
-			// button1
+			// blurButton
 			// 
-			this->button1->Location = System::Drawing::Point(195, 151);
-			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(110, 43);
-			this->button1->TabIndex = 0;
-			this->button1->Text = L"Blur image";
-			this->button1->UseVisualStyleBackColor = true;
-			this->button1->Click += gcnew System::EventHandler(this, &BlurForm::button1_Click);
+			this->blurButton->Location = System::Drawing::Point(195, 151);
+			this->blurButton->Name = L"blurButton";
+			this->blurButton->Size = System::Drawing::Size(110, 43);
+			this->blurButton->TabIndex = 0;
+			this->blurButton->Text = L"Blur image";
+			this->blurButton->UseVisualStyleBackColor = true;
+			this->blurButton->Click += gcnew System::EventHandler(this, &BlurForm::blurButton_Click);
 			// 
-			// trackBar1
+			// threadNumberTrackbar
 			// 
-			this->trackBar1->Location = System::Drawing::Point(12, 28);
-			this->trackBar1->Name = L"trackBar1";
-			this->trackBar1->Size = System::Drawing::Size(345, 56);
-			this->trackBar1->TabIndex = 1;
+			this->threadNumberTrackbar->Location = System::Drawing::Point(12, 28);
+			this->threadNumberTrackbar->Maximum = 64;
+			this->threadNumberTrackbar->Minimum = 1;
+			this->threadNumberTrackbar->Name = L"threadNumberTrackbar";
+			this->threadNumberTrackbar->Size = System::Drawing::Size(345, 56);
+			this->threadNumberTrackbar->TabIndex = 1;
+			this->threadNumberTrackbar->Value = 1;
+			this->threadNumberTrackbar->Scroll += gcnew System::EventHandler(this, &BlurForm::threadNumberTrackbar_Scroll);
 			// 
 			// label1
 			// 
@@ -111,55 +131,55 @@ namespace BlurApp {
 			this->label1->TabIndex = 2;
 			this->label1->Text = L"Iloœæ w¹tków";
 			// 
-			// radioButton1
+			// asmRadioButton
 			// 
-			this->radioButton1->AutoSize = true;
-			this->radioButton1->Location = System::Drawing::Point(0, 20);
-			this->radioButton1->Name = L"radioButton1";
-			this->radioButton1->Size = System::Drawing::Size(57, 20);
-			this->radioButton1->TabIndex = 3;
-			this->radioButton1->TabStop = true;
-			this->radioButton1->Text = L"ASM";
-			this->radioButton1->UseVisualStyleBackColor = true;
+			this->asmRadioButton->AutoSize = true;
+			this->asmRadioButton->Checked = true;
+			this->asmRadioButton->Location = System::Drawing::Point(0, 20);
+			this->asmRadioButton->Name = L"asmRadioButton";
+			this->asmRadioButton->Size = System::Drawing::Size(57, 20);
+			this->asmRadioButton->TabIndex = 3;
+			this->asmRadioButton->TabStop = true;
+			this->asmRadioButton->Text = L"ASM";
+			this->asmRadioButton->UseVisualStyleBackColor = true;
 			// 
-			// groupBox1
+			// chooseDllGroupBox
 			// 
-			this->groupBox1->Controls->Add(this->radioButton2);
-			this->groupBox1->Controls->Add(this->radioButton1);
-			this->groupBox1->Location = System::Drawing::Point(15, 90);
-			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(139, 104);
-			this->groupBox1->TabIndex = 4;
-			this->groupBox1->TabStop = false;
-			this->groupBox1->Text = L"Biblioteka DLL";
+			this->chooseDllGroupBox->Controls->Add(this->cRadioButton);
+			this->chooseDllGroupBox->Controls->Add(this->asmRadioButton);
+			this->chooseDllGroupBox->Location = System::Drawing::Point(15, 90);
+			this->chooseDllGroupBox->Name = L"chooseDllGroupBox";
+			this->chooseDllGroupBox->Size = System::Drawing::Size(139, 104);
+			this->chooseDllGroupBox->TabIndex = 4;
+			this->chooseDllGroupBox->TabStop = false;
+			this->chooseDllGroupBox->Text = L"Biblioteka DLL";
 			// 
-			// radioButton2
+			// cRadioButton
 			// 
-			this->radioButton2->AutoSize = true;
-			this->radioButton2->Location = System::Drawing::Point(0, 46);
-			this->radioButton2->Name = L"radioButton2";
-			this->radioButton2->Size = System::Drawing::Size(51, 20);
-			this->radioButton2->TabIndex = 4;
-			this->radioButton2->TabStop = true;
-			this->radioButton2->Text = L"C++";
-			this->radioButton2->UseVisualStyleBackColor = true;
+			this->cRadioButton->AutoSize = true;
+			this->cRadioButton->Location = System::Drawing::Point(0, 46);
+			this->cRadioButton->Name = L"cRadioButton";
+			this->cRadioButton->Size = System::Drawing::Size(51, 20);
+			this->cRadioButton->TabIndex = 4;
+			this->cRadioButton->Text = L"C++";
+			this->cRadioButton->UseVisualStyleBackColor = true;
 			// 
-			// pictureBox1
+			// originalImagePictureBox
 			// 
-			this->pictureBox1->Location = System::Drawing::Point(387, 28);
-			this->pictureBox1->Name = L"pictureBox1";
-			this->pictureBox1->Size = System::Drawing::Size(361, 331);
-			this->pictureBox1->TabIndex = 5;
-			this->pictureBox1->TabStop = false;
-			this->pictureBox1->SizeMode = PictureBoxSizeMode::Zoom;
+			this->originalImagePictureBox->Location = System::Drawing::Point(421, 28);
+			this->originalImagePictureBox->Name = L"originalImagePictureBox";
+			this->originalImagePictureBox->Size = System::Drawing::Size(361, 331);
+			this->originalImagePictureBox->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
+			this->originalImagePictureBox->TabIndex = 5;
+			this->originalImagePictureBox->TabStop = false;
 			// 
-			// pictureBox2
+			// blurredImagePictureBox
 			// 
-			this->pictureBox2->Location = System::Drawing::Point(811, 28);
-			this->pictureBox2->Name = L"pictureBox2";
-			this->pictureBox2->Size = System::Drawing::Size(361, 331);
-			this->pictureBox2->TabIndex = 6;
-			this->pictureBox2->TabStop = false;
+			this->blurredImagePictureBox->Location = System::Drawing::Point(811, 28);
+			this->blurredImagePictureBox->Name = L"blurredImagePictureBox";
+			this->blurredImagePictureBox->Size = System::Drawing::Size(361, 331);
+			this->blurredImagePictureBox->TabIndex = 6;
+			this->blurredImagePictureBox->TabStop = false;
 			// 
 			// FileDialog
 			// 
@@ -176,37 +196,63 @@ namespace BlurApp {
 			this->chooseImageButton->UseVisualStyleBackColor = true;
 			this->chooseImageButton->Click += gcnew System::EventHandler(this, &BlurForm::chooseImageButton_Click);
 			// 
+			// threadNumberLabel
+			// 
+			this->threadNumberLabel->AutoSize = true;
+			this->threadNumberLabel->Location = System::Drawing::Point(363, 28);
+			this->threadNumberLabel->Name = L"threadNumberLabel";
+			this->threadNumberLabel->Size = System::Drawing::Size(14, 16);
+			this->threadNumberLabel->TabIndex = 8;
+			this->threadNumberLabel->Text = L"1";
+			// 
 			// BlurForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1215, 405);
+			this->Controls->Add(this->threadNumberLabel);
 			this->Controls->Add(this->chooseImageButton);
-			this->Controls->Add(this->pictureBox2);
-			this->Controls->Add(this->pictureBox1);
-			this->Controls->Add(this->groupBox1);
+			this->Controls->Add(this->blurredImagePictureBox);
+			this->Controls->Add(this->originalImagePictureBox);
+			this->Controls->Add(this->chooseDllGroupBox);
 			this->Controls->Add(this->label1);
-			this->Controls->Add(this->trackBar1);
-			this->Controls->Add(this->button1);
+			this->Controls->Add(this->threadNumberTrackbar);
+			this->Controls->Add(this->blurButton);
 			this->Name = L"BlurForm";
 			this->Text = L"BlurForm";
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->trackBar1))->EndInit();
-			this->groupBox1->ResumeLayout(false);
-			this->groupBox1->PerformLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->threadNumberTrackbar))->EndInit();
+			this->chooseDllGroupBox->ResumeLayout(false);
+			this->chooseDllGroupBox->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->originalImagePictureBox))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->blurredImagePictureBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
-	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void blurButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (this->blurManager->isFileLoaded) {
+			this->blurManager->runBlur(64, false);
+			this->blurManager->exportImage("output.bmp");
+		}
+		//this->blurredImagePictureBox->Image = Image::FromFile("output.bmp");
 	}
 	
 	private: System::Void chooseImageButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (this->FileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
-			this->pictureBox1->ImageLocation = this->FileDialog->FileName;
+			this->originalImagePictureBox->ImageLocation = this->FileDialog->FileName;
+
+			const char* str = (const char*)(void*)
+				Marshal::StringToHGlobalAnsi(this->FileDialog->FileName->ToString());
+			// use str here for the ofstream filename
+			//Marshal::FreeHGlobal(str);
+
+			this->blurManager->loadBMP(str);
+			
 		}
 	}
+private: System::Void threadNumberTrackbar_Scroll(System::Object^ sender, System::EventArgs^ e) {
+	this->threadNumberLabel->Text = this->threadNumberTrackbar->Value.ToString();
+}
 };
 }

@@ -2,8 +2,8 @@
 
 void BitmapManager::loadBMP(const char* filename)
 {
-    delete[] this->imageData;
-    delete[] this->blurredImageData;
+    //delete[] this->imageData;
+    //delete[] this->blurredImageData;
 
     //Otwórz plik
     FILE* file = fopen(filename, "rb");
@@ -37,11 +37,13 @@ BitmapManager::BitmapManager()
 {
     //Za³aduj bitmapê
  //   this->loadBMP(filename);
-
+    
     //Zaalokowanie ma³ego obszaru pamiêci, aby delete na pocz¹tku metody loadBMP
     //nie spowodowa³ b³êdu
     this->imageData = new unsigned char[1];
     this->blurredImageData = new unsigned char[1];
+
+    this->isFileLoaded = false;
 
     //Wygeneruj uchwyty do DLL
     this->hinstLibAsm = LoadLibrary(TEXT("BlurAsmDll.dll"));
@@ -322,6 +324,7 @@ void BitmapManager::exportImage(const char * filename)
     fwrite(&(this->infoHeader), sizeof(BitmapInfoHeader), 1, outputFile);
     fseek(outputFile, this->fileHeader.bfOffBits, SEEK_SET);
     fwrite(this->blurredImageData, sizeof(unsigned char), dataSize, outputFile);
+    fclose(outputFile);
 }
 
 BitmapManager::~BitmapManager()
