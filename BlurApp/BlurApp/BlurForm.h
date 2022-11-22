@@ -28,12 +28,7 @@ namespace BlurApp {
 			//
 			//TODO: W tym miejscu dodaj kod konstruktora
 			//
-			// 
-			//this->blurManager = new BitmapManager();
-			//this->blurManager->loadBMP("land2.bmp");
-			//this->blurManager->runBlur(64, true);
-			//this->blurManager->exportImage("TESTFORM.bmp");
-
+			
 			this->blurManager = new BitmapManager();
 		}
 
@@ -217,7 +212,7 @@ namespace BlurApp {
 			// funcInfoLabel
 			// 
 			this->funcInfoLabel->AutoSize = true;
-			this->funcInfoLabel->Location = System::Drawing::Point(12, 490);
+			this->funcInfoLabel->Location = System::Drawing::Point(12, 467);
 			this->funcInfoLabel->Name = L"funcInfoLabel";
 			this->funcInfoLabel->Size = System::Drawing::Size(0, 16);
 			this->funcInfoLabel->TabIndex = 9;
@@ -250,18 +245,17 @@ namespace BlurApp {
 #pragma endregion
 	private: System::Void blurButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (this->blurManager->isFileLoaded) {
-			if (this->asmRadioButton->Checked) {
+			if (this->asmRadioButton->Checked)
 				this->blurManager->runBlur(this->threadNumberTrackbar->Value, false);
-				this->funcInfoLabel->Text = "Ran function with ASM DLL with "
-					+ this->threadNumberTrackbar->Value
-					+ (this->threadNumberTrackbar->Value == 1 ? " thread" : " threads");
-			}
-			else {
+			else
 				this->blurManager->runBlur(this->threadNumberTrackbar->Value, true);
-				this->funcInfoLabel->Text = "Ran function with C++ DLL with " 
-					+ this->threadNumberTrackbar->Value
-					+ (this->threadNumberTrackbar->Value == 1 ? " thread" : " threads");
-			}
+			
+			this->funcInfoLabel->Text = "Ran function with "
+				+ (this->asmRadioButton->Checked ? "ASM" : "C++")
+				+ " DLL with "
+				+ this->threadNumberTrackbar->Value
+				+ (this->threadNumberTrackbar->Value == 1 ? " thread" : " threads")
+				+ ".\nTime is " + this->blurManager->getLastRuntime() + " microseconds.";
 			this->blurManager->exportImage("output.bmp");
 			this->blurredImagePictureBox->ImageLocation = "output.bmp";
 			

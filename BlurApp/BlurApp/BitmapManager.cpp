@@ -1,5 +1,10 @@
 #include "BitmapManager.h"
 
+void BitmapManager::setLastRuntime(long long duration)
+{
+    this->lastRuntime = duration;
+}
+
 void BitmapManager::loadBMP(const char* filename)
 {
    if (this->isFileLoaded) {
@@ -49,6 +54,7 @@ BitmapManager::BitmapManager()
     //this->imageData = new unsigned char[1];
     //this->blurredImageData = new unsigned char[1];
 
+    this->lastRuntime = 0;
     this->isFileLoaded = false;
 
     //Wygeneruj uchwyty do DLL
@@ -126,34 +132,58 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
         additionalThreadBytes = threadNumber * moduloPerThread;
     }
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     for (int i = 0; i < threadNumber; i++) {
-        threads.push_back(std::thread([this, choice, i, bytesPerThread]() {
-            if (!choice) {
-                this->handleToAsmBlur(this->imageData + 6 + i * bytesPerThread, 
-                    this->blurredImageData + i * bytesPerThread, bytesPerThread); 
-            }
-            else {
-                this->handleToCBlur(this->imageData + 6 + i * bytesPerThread,
-                    this->blurredImageData + i * bytesPerThread, bytesPerThread);  
-            }
-        }));
+        //threads.push_back(std::thread([this, choice, i, bytesPerThread]() {
+        //    if (!choice) {
+        //        this->handleToAsmBlur(this->imageData + 9 + i * bytesPerThread, 
+        //            this->blurredImageData + i * bytesPerThread, bytesPerThread); 
+        //    }
+        //    else {
+        //        this->handleToCBlur(this->imageData + 9 + i * bytesPerThread,
+        //            this->blurredImageData + i * bytesPerThread, bytesPerThread);  
+        //    }
+        //})
+        //);
+        
+        if (!choice) {
+            threads.push_back(std::thread(this->handleToAsmBlur, this->imageData + 9 + i * bytesPerThread,
+                this->blurredImageData + i * bytesPerThread, bytesPerThread));
+        }
+        else {
+            threads.push_back(std::thread(this->handleToCBlur, this->imageData + 9 + i * bytesPerThread,
+                this->blurredImageData + i * bytesPerThread, bytesPerThread));
+        }
     }
     if (startAdditionalThread) {
-        threads.push_back(std::thread([this, choice, additionalThreadBytes,
-            bytesPerThread, threadNumber]() {
-            if (!choice) {
-                this->handleToAsmBlur(this->imageData + 6 + threadNumber * bytesPerThread,
-                    this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
-            }
-            else {
-                this->handleToCBlur(this->imageData + 6 + threadNumber * bytesPerThread,
-                    this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
-            }
-        }));
+        //threads.push_back(std::thread([this, choice, additionalThreadBytes,
+        //    bytesPerThread, threadNumber]() {
+        //    if (!choice) {
+        //        this->handleToAsmBlur(this->imageData + 6 + threadNumber * bytesPerThread,
+        //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
+        //    }
+        //    else {
+        //        this->handleToCBlur(this->imageData + 6 + threadNumber * bytesPerThread,
+        //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
+        //    }
+        //}));
+        if (!choice)
+            threads.push_back(std::thread(this->handleToAsmBlur, 
+                this->imageData + 9 + threadNumber * bytesPerThread,
+                this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes));
+        else 
+            threads.push_back(std::thread(this->handleToCBlur,
+                this->imageData + 9 + threadNumber * bytesPerThread,
+                this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes));
     }
 
     for (auto& t : threads)
         t.join();
+
+    auto finish = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(finish - start);
+    this->setLastRuntime(duration.count());
 
  //   if (threadNumber > this->infoHeader.biHeight)
  //       threadNumber = this->infoHeader.biHeight;
@@ -327,6 +357,11 @@ void BitmapManager::exportImage(const char * filename)
     fseek(outputFile, this->fileHeader.bfOffBits, SEEK_SET);
     fwrite(this->blurredImageData, sizeof(unsigned char), dataSize, outputFile);
     fclose(outputFile);
+}
+
+long long BitmapManager::getLastRuntime()
+{
+    return this->lastRuntime;
 }
 
 BitmapManager::~BitmapManager()

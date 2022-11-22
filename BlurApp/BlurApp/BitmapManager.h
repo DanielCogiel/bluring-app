@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <vector>
 #include <thread>
-#include <memory>
+#include <chrono>
 
 typedef int(__cdecl* MYPROC)(unsigned char*, unsigned char*, DWORD);
 typedef int(__cdecl* ASM_PROC)(unsigned char*, unsigned char*, DWORD); //(imageData, bytesPerRow, linesToProcess)
@@ -21,6 +21,9 @@ public:
 	HINSTANCE hinstLibAsm;
 	MYPROC handleToCBlur;
 	ASM_PROC handleToAsmBlur;
+	long long lastRuntime;
+
+	void setLastRuntime(long long duration);
 public: 
 	bool isFileLoaded;
 	void loadBMP(const char* filename);
@@ -30,6 +33,7 @@ public:
 	void runBlur(int threadNumber, bool choice);
 	void TestLoading(int threadNumber);
 	void exportImage(const char* filename);
+	long long getLastRuntime();
 	~BitmapManager();
 };
 
