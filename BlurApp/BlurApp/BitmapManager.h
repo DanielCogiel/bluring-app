@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <vector>
 #include <thread>
+#include <memory>
 
 typedef int(__cdecl* MYPROC)(unsigned char*, unsigned char*, DWORD);
 typedef int(__cdecl* ASM_PROC)(unsigned char*, unsigned char*, DWORD); //(imageData, bytesPerRow, linesToProcess)

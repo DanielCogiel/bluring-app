@@ -67,6 +67,7 @@ namespace BlurApp {
 	private: System::Windows::Forms::OpenFileDialog^ FileDialog;
 	private: System::Windows::Forms::Button^ chooseImageButton;
 	private: System::Windows::Forms::Label^ threadNumberLabel;
+	private: System::Windows::Forms::Label^ funcInfoLabel;
 
 
 	protected:
@@ -95,6 +96,7 @@ namespace BlurApp {
 			this->FileDialog = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->chooseImageButton = (gcnew System::Windows::Forms::Button());
 			this->threadNumberLabel = (gcnew System::Windows::Forms::Label());
+			this->funcInfoLabel = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->threadNumberTrackbar))->BeginInit();
 			this->chooseDllGroupBox->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->originalImagePictureBox))->BeginInit();
@@ -103,7 +105,7 @@ namespace BlurApp {
 			// 
 			// blurButton
 			// 
-			this->blurButton->Location = System::Drawing::Point(195, 151);
+			this->blurButton->Location = System::Drawing::Point(215, 151);
 			this->blurButton->Name = L"blurButton";
 			this->blurButton->Size = System::Drawing::Size(110, 43);
 			this->blurButton->TabIndex = 0;
@@ -166,18 +168,25 @@ namespace BlurApp {
 			// 
 			// originalImagePictureBox
 			// 
-			this->originalImagePictureBox->Location = System::Drawing::Point(421, 28);
+			this->originalImagePictureBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
+				| System::Windows::Forms::AnchorStyles::Left));
+			this->originalImagePictureBox->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->originalImagePictureBox->Location = System::Drawing::Point(415, 12);
 			this->originalImagePictureBox->Name = L"originalImagePictureBox";
-			this->originalImagePictureBox->Size = System::Drawing::Size(361, 331);
+			this->originalImagePictureBox->Size = System::Drawing::Size(485, 494);
 			this->originalImagePictureBox->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
 			this->originalImagePictureBox->TabIndex = 5;
 			this->originalImagePictureBox->TabStop = false;
 			// 
 			// blurredImagePictureBox
 			// 
-			this->blurredImagePictureBox->Location = System::Drawing::Point(811, 28);
+			this->blurredImagePictureBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->blurredImagePictureBox->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->blurredImagePictureBox->Location = System::Drawing::Point(906, 12);
 			this->blurredImagePictureBox->Name = L"blurredImagePictureBox";
-			this->blurredImagePictureBox->Size = System::Drawing::Size(361, 331);
+			this->blurredImagePictureBox->Size = System::Drawing::Size(485, 494);
+			this->blurredImagePictureBox->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
 			this->blurredImagePictureBox->TabIndex = 6;
 			this->blurredImagePictureBox->TabStop = false;
 			// 
@@ -188,7 +197,7 @@ namespace BlurApp {
 			// 
 			// chooseImageButton
 			// 
-			this->chooseImageButton->Location = System::Drawing::Point(195, 90);
+			this->chooseImageButton->Location = System::Drawing::Point(215, 90);
 			this->chooseImageButton->Name = L"chooseImageButton";
 			this->chooseImageButton->Size = System::Drawing::Size(110, 43);
 			this->chooseImageButton->TabIndex = 7;
@@ -205,11 +214,20 @@ namespace BlurApp {
 			this->threadNumberLabel->TabIndex = 8;
 			this->threadNumberLabel->Text = L"1";
 			// 
+			// funcInfoLabel
+			// 
+			this->funcInfoLabel->AutoSize = true;
+			this->funcInfoLabel->Location = System::Drawing::Point(12, 490);
+			this->funcInfoLabel->Name = L"funcInfoLabel";
+			this->funcInfoLabel->Size = System::Drawing::Size(0, 16);
+			this->funcInfoLabel->TabIndex = 9;
+			// 
 			// BlurForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1215, 405);
+			this->ClientSize = System::Drawing::Size(1403, 521);
+			this->Controls->Add(this->funcInfoLabel);
 			this->Controls->Add(this->threadNumberLabel);
 			this->Controls->Add(this->chooseImageButton);
 			this->Controls->Add(this->blurredImagePictureBox);
@@ -232,22 +250,42 @@ namespace BlurApp {
 #pragma endregion
 	private: System::Void blurButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (this->blurManager->isFileLoaded) {
-			this->blurManager->runBlur(64, false);
+			if (this->asmRadioButton->Checked) {
+				this->blurManager->runBlur(this->threadNumberTrackbar->Value, false);
+				this->funcInfoLabel->Text = "Ran function with ASM DLL with "
+					+ this->threadNumberTrackbar->Value
+					+ (this->threadNumberTrackbar->Value == 1 ? " thread" : " threads");
+			}
+			else {
+				this->blurManager->runBlur(this->threadNumberTrackbar->Value, true);
+				this->funcInfoLabel->Text = "Ran function with C++ DLL with " 
+					+ this->threadNumberTrackbar->Value
+					+ (this->threadNumberTrackbar->Value == 1 ? " thread" : " threads");
+			}
 			this->blurManager->exportImage("output.bmp");
+			this->blurredImagePictureBox->ImageLocation = "output.bmp";
+			
 		}
+		
+		
 		//this->blurredImagePictureBox->Image = Image::FromFile("output.bmp");
 	}
 	
 	private: System::Void chooseImageButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (this->FileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
 			this->originalImagePictureBox->ImageLocation = this->FileDialog->FileName;
-
-			const char* str = (const char*)(void*)
-				Marshal::StringToHGlobalAnsi(this->FileDialog->FileName->ToString());
+			this->blurredImagePictureBox->Image = nullptr;
+			//const char* str = (const char*)(void*)
+			//	Marshal::StringToHGlobalAnsi(this->FileDialog->FileName->ToString());
 			// use str here for the ofstream filename
 			//Marshal::FreeHGlobal(str);
 
+			IntPtr tmpHandle = Marshal::StringToHGlobalAnsi(this->FileDialog->FileName->ToString());
+			const char* str = static_cast<char*> (tmpHandle.ToPointer());
+
 			this->blurManager->loadBMP(str);
+
+			Marshal::FreeHGlobal(tmpHandle);
 			
 		}
 	}

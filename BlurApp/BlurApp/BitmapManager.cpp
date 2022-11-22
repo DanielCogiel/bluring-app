@@ -2,8 +2,12 @@
 
 void BitmapManager::loadBMP(const char* filename)
 {
-    //delete[] this->imageData;
-    //delete[] this->blurredImageData;
+   if (this->isFileLoaded) {
+       delete[] this->imageData;
+       this->imageData = nullptr;
+       delete[] this->blurredImageData;
+       this->blurredImageData = nullptr;
+   }
 
     //Otwórz plik
     FILE* file = fopen(filename, "rb");
@@ -18,18 +22,20 @@ void BitmapManager::loadBMP(const char* filename)
     fread(&(this->infoHeader), sizeof(BitmapInfoHeader), 1, file);
 
     auto dataSize = this->infoHeader.biSizeImage;
-    unsigned char* imageData1 = new unsigned char[dataSize + 12];
+    unsigned char* imageData1 = new unsigned char[dataSize + 18];
 
     //Odczytaj dane obrazu
     fseek(file, this->fileHeader.bfOffBits, SEEK_SET);
-    fread(imageData1 + 6, sizeof(unsigned char), dataSize, file);
+    fread(imageData1 + 9, sizeof(unsigned char), dataSize, file);
+    fclose(file);
 
     this->imageData = imageData1;
-    this->blurredImageData = new unsigned char[dataSize];
+    this->blurredImageData = new unsigned char[dataSize + 4];
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 9; i++) {
         this->imageData[i] = 0;
-        this->imageData[dataSize + 12 - i - 1] = 0;
+        this->imageData[dataSize + 18 - i - 1] = 0;
+        this->blurredImageData[dataSize + 4 - i - 1] = 0;
     }
 }
 
@@ -40,8 +46,8 @@ BitmapManager::BitmapManager()
     
     //Zaalokowanie ma³ego obszaru pamiêci, aby delete na pocz¹tku metody loadBMP
     //nie spowodowa³ b³êdu
-    this->imageData = new unsigned char[1];
-    this->blurredImageData = new unsigned char[1];
+    //this->imageData = new unsigned char[1];
+    //this->blurredImageData = new unsigned char[1];
 
     this->isFileLoaded = false;
 
@@ -70,10 +76,8 @@ void BitmapManager::printImageOnConsole()
     //Wypisz ca³y obraz
     for (int y = 0; y < this->infoHeader.biSizeImage; y += bytesPerRow) {
         for (int x = 0; x < bytesPerRow; x++) {
-       //     if (int(*(this->imageData + x)) != 0) {
             std::cout << std::setw(3) << float(*(this->imageData + x));
             std::cout << " ";
-       //     }
         }
         std::cout << std::endl;
     }
@@ -103,8 +107,6 @@ void BitmapManager::printBytes(int numberOfBytes, bool choice)
     }
     std::cout << std::endl;
 }
-
-
 
 void BitmapManager::runBlur(int threadNumber, bool choice)
 {

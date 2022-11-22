@@ -116,8 +116,8 @@ BlurProc proc
 
 ThreadLoop:
 	cmp r10, 0				
-	jl PerformAdditionalBlur	;if byteCounter < 0 perform one additional blur
-	je Finish					;if byteCounter = 0 jump straight to finish
+	;jl PerformAdditionalBlur	;if byteCounter < 0 perform one additional blur
+	jl Finish					;if byteCounter = 0 jump straight to finish
 	;
 	mov eax, dword ptr [r14]	;move 4 bytes of original image data to EAX
 	movd xmm0, eax				;move data from EAX to XMM0's last dword
