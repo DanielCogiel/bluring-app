@@ -121,69 +121,121 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
 
     std::vector<std::thread> threads;
 
-    int bytesPerThread = this->infoHeader.biSizeImage / threadNumber;
-    int moduloPerThread = bytesPerThread % 4;
+    int bytesPerLine = this->infoHeader.biSizeImage / this->infoHeader.biHeight;
+    int linesPerThread = this->infoHeader.biHeight / threadNumber;
+    int additionalLines = this->infoHeader.biHeight % threadNumber;
     bool startAdditionalThread = false;
-    int additionalThreadBytes = 0;
 
-    if (moduloPerThread > 0) {
-        bytesPerThread -= moduloPerThread;
+    
+
+    if (additionalLines > 0)
         startAdditionalThread = true;
-        additionalThreadBytes = threadNumber * moduloPerThread;
-    }
 
     auto start = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < threadNumber; i++) {
-        //threads.push_back(std::thread([this, choice, i, bytesPerThread]() {
-        //    if (!choice) {
-        //        this->handleToAsmBlur(this->imageData + 9 + i * bytesPerThread, 
-        //            this->blurredImageData + i * bytesPerThread, bytesPerThread); 
-        //    }
-        //    else {
-        //        this->handleToCBlur(this->imageData + 9 + i * bytesPerThread,
-        //            this->blurredImageData + i * bytesPerThread, bytesPerThread);  
-        //    }
-        //})
-        //);
-        
-        if (!choice) {
-            threads.push_back(std::thread(this->handleToAsmBlur, this->imageData + 9 + i * bytesPerThread,
-                this->blurredImageData + i * bytesPerThread, bytesPerThread));
-        }
-        else {
-            threads.push_back(std::thread(this->handleToCBlur, this->imageData + 9 + i * bytesPerThread,
-                this->blurredImageData + i * bytesPerThread, bytesPerThread));
-        }
+        threads.push_back(std::thread([this, choice, bytesPerLine, linesPerThread, i]() {
+            if (!choice) {
+                this->handleToAsmBlur(this->imageData + i * bytesPerLine * linesPerThread + 9, 
+                    this->blurredImageData + i * bytesPerLine * linesPerThread,
+                    bytesPerLine, linesPerThread);
+            }
+            else {
+                this->handleToCBlur(this->imageData + i * bytesPerLine * linesPerThread + 9,
+                    this->blurredImageData + i * bytesPerLine * linesPerThread,
+                    bytesPerLine, linesPerThread);
+            }
+        }   ));
     }
+
     if (startAdditionalThread) {
-        //threads.push_back(std::thread([this, choice, additionalThreadBytes,
-        //    bytesPerThread, threadNumber]() {
-        //    if (!choice) {
-        //        this->handleToAsmBlur(this->imageData + 6 + threadNumber * bytesPerThread,
-        //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
-        //    }
-        //    else {
-        //        this->handleToCBlur(this->imageData + 6 + threadNumber * bytesPerThread,
-        //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
-        //    }
-        //}));
-        if (!choice)
-            threads.push_back(std::thread(this->handleToAsmBlur, 
-                this->imageData + 9 + threadNumber * bytesPerThread,
-                this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes));
-        else 
-            threads.push_back(std::thread(this->handleToCBlur,
-                this->imageData + 9 + threadNumber * bytesPerThread,
-                this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes));
+        threads.push_back(std::thread([this, choice, bytesPerLine, linesPerThread,
+            threadNumber, additionalLines]() {
+            if (!choice) {
+                this->handleToAsmBlur(this->imageData + threadNumber * bytesPerLine * linesPerThread + 9,
+                    this->blurredImageData + threadNumber * bytesPerLine * linesPerThread,
+                    bytesPerLine, additionalLines);
+            }
+            else {
+                this->handleToCBlur(this->imageData + threadNumber * bytesPerLine * linesPerThread + 9,
+                    this->blurredImageData + threadNumber * bytesPerLine * linesPerThread,
+                    bytesPerLine, additionalLines);
+            }
+            }));
     }
 
     for (auto& t : threads)
         t.join();
-
+    
     auto finish = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(finish - start);
     this->setLastRuntime(duration.count());
+
+    //int bytesPerThread = this->infoHeader.biSizeImage / threadNumber;
+    //int moduloPerThread = bytesPerThread % 4;
+    //bool startAdditionalThread = false;
+    //int additionalThreadBytes = 0;
+    //
+    //if (moduloPerThread > 0) {
+    //    bytesPerThread -= moduloPerThread;
+    //    startAdditionalThread = true;
+    //    additionalThreadBytes = threadNumber * moduloPerThread;
+    //}
+    //
+    //auto start = std::chrono::high_resolution_clock::now();
+    //
+    //for (int i = 0; i < threadNumber; i++) {
+    //    //threads.push_back(std::thread([this, choice, i, bytesPerThread]() {
+    //    //    if (!choice) {
+    //    //        this->handleToAsmBlur(this->imageData + 9 + i * bytesPerThread, 
+    //    //            this->blurredImageData + i * bytesPerThread, bytesPerThread); 
+    //    //    }
+    //    //    else {
+    //    //        this->handleToCBlur(this->imageData + 9 + i * bytesPerThread,
+    //    //            this->blurredImageData + i * bytesPerThread, bytesPerThread);  
+    //    //    }
+    //    //})
+    //    //);
+    //    
+    //    if (!choice) {
+    //        threads.push_back(std::thread(this->handleToAsmBlur, this->imageData + 9 + i * bytesPerThread,
+    //            this->blurredImageData + i * bytesPerThread, bytesPerThread));
+    //    }
+    //    else {
+    //        threads.push_back(std::thread(this->handleToCBlur, this->imageData + 9 + i * bytesPerThread,
+    //            this->blurredImageData + i * bytesPerThread, bytesPerThread));
+    //    }
+    //}
+    //if (startAdditionalThread) {
+    //    //threads.push_back(std::thread([this, choice, additionalThreadBytes,
+    //    //    bytesPerThread, threadNumber]() {
+    //    //    if (!choice) {
+    //    //        this->handleToAsmBlur(this->imageData + 6 + threadNumber * bytesPerThread,
+    //    //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
+    //    //    }
+    //    //    else {
+    //    //        this->handleToCBlur(this->imageData + 6 + threadNumber * bytesPerThread,
+    //    //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes);
+    //    //    }
+    //    //}));
+    //    if (!choice)
+    //        threads.push_back(std::thread(this->handleToAsmBlur, 
+    //            this->imageData + 9 + threadNumber * bytesPerThread,
+    //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes));
+    //    else 
+    //        threads.push_back(std::thread(this->handleToCBlur,
+    //            this->imageData + 9 + threadNumber * bytesPerThread,
+    //            this->blurredImageData + threadNumber * bytesPerThread, additionalThreadBytes));
+    //}
+    //
+    //for (auto& t : threads)
+    //    t.join();
+    //
+    //auto finish = std::chrono::high_resolution_clock::now();
+    //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(finish - start);
+    //this->setLastRuntime(duration.count());
+    //GOOD
+
 
  //   if (threadNumber > this->infoHeader.biHeight)
  //       threadNumber = this->infoHeader.biHeight;

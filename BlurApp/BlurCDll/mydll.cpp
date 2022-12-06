@@ -4,12 +4,12 @@
 #include <iostream>
 
 void BlurProc(unsigned char* origImage, unsigned char* blurredImage,
-    DWORD bytesPerThread) {
+    DWORD bytesPerThread, DWORD linesToProcess) {
 
-    for (int i = 0; i < bytesPerThread; i++) {
+   /* for (int i = 0; i < bytesPerThread; i++) {
         blurredImage[i] = ((origImage[i] + origImage[i - 3] + origImage[i - 6]
             + origImage[i + 3] + origImage[i + 6]) * 3 + 3) >> 4;
-    }
+    }*/
 
 
    // for (int i = 0; i < linesToProcess; i++) {

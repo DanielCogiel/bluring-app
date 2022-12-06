@@ -6,13 +6,17 @@ myVar db 0, 4, 8, 12, 12 dup (-1)
 
 ;############################################################################################
 ; BlurProc(unsigned char* imageData, unsigned char* blurredImageData, 
-; unsigned long bytesPerRow, unsigned long linesToProcess)
+; unsigned long bytesPerLine, unsigned long linesToProcess)
 ; RCX - imageData
 ; RDX - blurredImageData
-; R8 - bytesPerThread
-; R10 - byteCounter
-; R14 - imageData
-; R15 - blurredImageData
+; R8 - bytesPerLine
+; R9 - linesToProcess
+;
+; R10 - horizontal counter
+; R11 - vertical counter
+; R12 - start new line address counter (because line may not be dividable by 3)
+; R14 - imageData current pointer
+; R15 - blurredImageData current pointer
 ; XMM0 - currently calculated pixel
 ; XMM1 - register to store values of pixels used to calculated average value of current pixel
 ; XMM6 - vector of dword 3s used to multiply xmm0 values
@@ -20,6 +24,82 @@ myVar db 0, 4, 8, 12, 12 dup (-1)
 ;############################################################################################
 
 BlurProc proc 
+	mov r14, rcx				;move original image pointer to r14
+	mov r15, rdx				;move blurred image pointer to r15
+	mov r10, r8					;set rowCounter to bytesPerLine value 
+	mov r11, r9					;set lineCounter to 0 
+	mov r12, 0
+
+	mov eax, 3					;move 4 dwords of value 3 to xmm6
+	movd xmm6, eax				;
+	vpbroadcastd xmm6, xmm6		;
+	mov eax, 4					;move 4 dwords of value 4 to xmm7
+	movd xmm7, eax				;
+	vpbroadcastd xmm7, xmm7		;
+	
+VerticalLoop:
+	cmp r11, 0					;if lineCounter == linesToProcess
+	je Finish					;finish algorithm
+	;LINES CODE
+HorizontalLoop:
+	cmp r10, 0					;if rowCounter == bytesPerRow - 8
+	jle ExitRowLoop				;move on to next line
+	;ROW CODE
+
+	mov eax, dword ptr [r14]	;move 4 bytes of original image to xmm0's last dword
+	movd xmm0, eax				;
+	pmovzxbd xmm0, xmm0			;convert xmm0's last 4 bytes to xmm0's dwords
+	mov eax, dword ptr [r14-3]	;move 4 previous bytes of original image to xmm1's last dword
+	movd xmm1, eax				;
+	pmovzxbd xmm1, xmm1			;convert xmm1's last 4 bytes to xmm1's dwords
+	paddd xmm0, xmm1			;add xmm1's and xmm0's dwords
+	mov eax, dword ptr [r14-6]	
+	movd xmm1, eax
+	pmovzxbd xmm1, xmm1
+	paddd xmm0, xmm1
+	mov eax, dword ptr [r14+3]
+	movd xmm1, eax
+	pmovzxbd xmm1, xmm1
+	paddd xmm0, xmm1
+	mov eax, dword ptr [r14+6]
+	movd xmm1, eax
+	pmovzxbd xmm1, xmm1 ;To mo¿na od razu wczytaæ do xmm1
+	paddd xmm0, xmm1
+
+	pmulld xmm0, xmm6			;perform divide by 5 on xmm0's dwords (multiply dwords by 2^4 / 5 = 3)
+	paddd xmm0, xmm6			;add 2^4 / 5 to xmm0's dwords
+	vpsrlvd xmm0, xmm0, xmm7	;shift xmm0's dwords right by 4 bits
+	pshufb xmm0, xmmword ptr myVar
+	pextrd eax, xmm0, 0
+	mov [r15], dword ptr eax
+
+	;
+	sub r10, 3					;move right by 4 bytes in row
+	add r14, 3					;move original image pointer 4 bytes right
+	add r15, 3					;move blurred image pointer 4 bytes right
+	jmp HorizontalLoop			;continue row loop
+ExitRowLoop:
+	;
+	dec r11						;increment lineCounter (move to next line)
+	mov r10, r8					;reset rowCounter
+	add r12, r8
+	
+	mov rax, rcx
+	add rax, r12
+	
+	mov r14, rax
+
+	mov rax, rdx
+	add rax, r12
+
+	mov r15, rax
+	jmp VerticalLoop			;continue line loop
+Finish:
+	emms 
+	ret 
+
+
+
 ;	mov r14, rcx
 ;	mov r15, rdx
 ;	mov r10, r8
@@ -104,80 +184,81 @@ BlurProc proc
 ;	emms 
 ;	ret
 
-	mov r14, rcx				;move original image pointer to r14
-	mov r15, rdx				;move blurred image pointer to r15
-	mov r10, r8					;move bytesPerThread value to r10
-	mov eax, 3
-	movd xmm6, eax
-	vpbroadcastd xmm6, xmm6		;create vector of 3s for later multiplication
-	mov eax, 4
-	movd xmm7, eax
-	vpbroadcastd xmm7, xmm7		;create vector of 4s for later right bit shift
-
-ThreadLoop:
-	cmp r10, 0				
-	;jl PerformAdditionalBlur	;if byteCounter < 0 perform one additional blur
-	jl Finish					;if byteCounter = 0 jump straight to finish
-	;
-	mov eax, dword ptr [r14]	;move 4 bytes of original image data to EAX
-	movd xmm0, eax				;move data from EAX to XMM0's last dword
-	pmovzxbd xmm0, xmm0			;convert XMM0's last 4 bytes to XMM0's dwords
-	mov eax, dword ptr [r14-3]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	mov eax, dword ptr [r14-6]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	mov eax, dword ptr [r14+3]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	mov eax, dword ptr [r14+6]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	pmulld xmm0, xmm6
-	paddd xmm0, xmm6
-	vpsrlvd xmm0, xmm0, xmm7
-	pshufb xmm0, xmmword ptr myVar
-	pextrd eax, xmm0, 0
-	mov [r15], dword ptr eax
-	;
-	add r14, 3
-	add r15, 3
-	sub r10, 3
-	jmp ThreadLoop
-PerformAdditionalBlur:
-	mov eax, dword ptr [r14]	;move 4 bytes of original image data to EAX
-	movd xmm0, eax				;move data from EAX to XMM0's last dword
-	pmovzxbd xmm0, xmm0			;convert XMM0's last 4 bytes to XMM0's dwords
-	mov eax, dword ptr [r14-3]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	mov eax, dword ptr [r14-6]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	mov eax, dword ptr [r14+3]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	mov eax, dword ptr [r14+6]
-	movd xmm1, eax
-	pmovzxbd xmm1, xmm1
-	paddd xmm0, xmm1
-	pmulld xmm0, xmm6
-	paddd xmm0, xmm6
-	vpsrlvd xmm0, xmm0, xmm7
-	pshufb xmm0, xmmword ptr myVar
-	pextrd eax, xmm0, 0
-	mov [r15], dword ptr eax
-Finish:	
-	emms 
-	ret
+;   PRETTY GOOD
+;	mov r14, rcx				;move original image pointer to r14
+;	mov r15, rdx				;move blurred image pointer to r15
+;	mov r10, r8					;move bytesPerThread value to r10
+;	mov eax, 3
+;	movd xmm6, eax
+;	vpbroadcastd xmm6, xmm6		;create vector of 3s for later multiplication
+;	mov eax, 4
+;	movd xmm7, eax
+;	vpbroadcastd xmm7, xmm7		;create vector of 4s for later right bit shift
+;
+;ThreadLoop:
+;	cmp r10, 0				
+;	;jl PerformAdditionalBlur	;if byteCounter < 0 perform one additional blur
+;	jl Finish					;if byteCounter = 0 jump straight to finish
+;	;
+;	mov eax, dword ptr [r14]	;move 4 bytes of original image data to EAX
+;	movd xmm0, eax				;move data from EAX to XMM0's last dword
+;	pmovzxbd xmm0, xmm0			;convert XMM0's last 4 bytes to XMM0's dwords
+;	mov eax, dword ptr [r14-3]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	mov eax, dword ptr [r14-6]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	mov eax, dword ptr [r14+3]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	mov eax, dword ptr [r14+6]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	pmulld xmm0, xmm6
+;	paddd xmm0, xmm6
+;	vpsrlvd xmm0, xmm0, xmm7
+;	pshufb xmm0, xmmword ptr myVar
+;	pextrd eax, xmm0, 0
+;	mov [r15], dword ptr eax
+;	;
+;	add r14, 3
+;	add r15, 3
+;	sub r10, 3
+;	jmp ThreadLoop
+;PerformAdditionalBlur:
+;	mov eax, dword ptr [r14]	;move 4 bytes of original image data to EAX
+;	movd xmm0, eax				;move data from EAX to XMM0's last dword
+;	pmovzxbd xmm0, xmm0			;convert XMM0's last 4 bytes to XMM0's dwords
+;	mov eax, dword ptr [r14-3]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	mov eax, dword ptr [r14-6]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	mov eax, dword ptr [r14+3]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	mov eax, dword ptr [r14+6]
+;	movd xmm1, eax
+;	pmovzxbd xmm1, xmm1
+;	paddd xmm0, xmm1
+;	pmulld xmm0, xmm6
+;	paddd xmm0, xmm6
+;	vpsrlvd xmm0, xmm0, xmm7
+;	pshufb xmm0, xmmword ptr myVar
+;	pextrd eax, xmm0, 0
+;	mov [r15], dword ptr eax
+;Finish:	
+;	emms 
+;	ret
 
 ;HALF GOOD
 ;	mov r14, rcx				;move original image pointer to r14
@@ -205,7 +286,7 @@ Finish:
 ;	cmp r10, r8					;if rowCounter == bytesPerRow - 8
 ;	je ExitRowLoop				;move on to next line
 ;	;ROW CODE
-
+;
 ;	mov eax, dword ptr [r14]	;move 4 bytes of original image to xmm0's last dword
 ;	movd xmm0, eax				;
 ;	pmovzxbd xmm0, xmm0			;convert xmm0's last 4 bytes to xmm0's dwords
@@ -232,7 +313,7 @@ Finish:
 ;	pshufb xmm0, xmmword ptr myVar
 ;	pextrd eax, xmm0, 0
 ;	mov [r15], dword ptr eax
-
+;
 ;	;
 ;	add r10, 4					;move right by 4 bytes in row
 ;	add r14, 4					;move original image pointer 4 bytes right
@@ -250,6 +331,8 @@ Finish:
 ;Finish:
 ;	emms 
 ;	ret 
+
+
 BlurProc endp 
 
 TestLoading proc

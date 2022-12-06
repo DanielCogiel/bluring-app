@@ -8,8 +8,8 @@
 #include <thread>
 #include <chrono>
 
-typedef int(__cdecl* MYPROC)(unsigned char*, unsigned char*, DWORD);
-typedef int(__cdecl* ASM_PROC)(unsigned char*, unsigned char*, DWORD); //(imageData, bytesPerRow, linesToProcess)
+typedef int(__cdecl* MYPROC)(unsigned char*, unsigned char*, DWORD, DWORD);
+typedef int(__cdecl* ASM_PROC)(unsigned char*, unsigned char*, DWORD, DWORD); //(imageData, blurredImageData, bytesPerRow, linesToProcess)
 
 class BitmapManager {
 public:
