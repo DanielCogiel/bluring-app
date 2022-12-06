@@ -42,6 +42,7 @@ namespace BlurApp {
 			{
 				delete components;
 			}
+			
 		}
 	private: System::Windows::Forms::TrackBar^ threadNumberTrackbar;
 	protected:

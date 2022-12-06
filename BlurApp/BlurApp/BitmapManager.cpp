@@ -141,7 +141,7 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
                     bytesPerLine, linesPerThread);
             }
             else {
-                this->handleToCBlur(this->imageData + i * bytesPerLine * linesPerThread + 9,
+                this->handleToCBlur(this->imageData + i * bytesPerLine * linesPerThread,
                     this->blurredImageData + i * bytesPerLine * linesPerThread,
                     bytesPerLine, linesPerThread);
             }
@@ -157,7 +157,7 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
                     bytesPerLine, additionalLines);
             }
             else {
-                this->handleToCBlur(this->imageData + threadNumber * bytesPerLine * linesPerThread + 9,
+                this->handleToCBlur(this->imageData + threadNumber * bytesPerLine * linesPerThread,
                     this->blurredImageData + threadNumber * bytesPerLine * linesPerThread,
                     bytesPerLine, additionalLines);
             }
@@ -420,7 +420,8 @@ BitmapManager::~BitmapManager()
 {
     //Zwolnij uchwyty do bibliotek
     FreeLibrary(this->hinstLibAsm);
-    FreeLibrary(this->hinstLibC); 
+    FreeLibrary(this->hinstLibC);
     delete[] this->imageData;
     delete[] this->blurredImageData;
+   
 }
