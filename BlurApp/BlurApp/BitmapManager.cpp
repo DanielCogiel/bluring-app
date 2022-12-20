@@ -135,17 +135,20 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
 
     for (int i = 0; i < threadNumber; i++) {
         threads.push_back(std::thread([this, choice, bytesPerLine, linesPerThread, i]() {
-            if (!choice) {
-                this->handleToAsmBlur(this->imageData + i * bytesPerLine * linesPerThread + 9, 
-                    this->blurredImageData + i * bytesPerLine * linesPerThread,
-                    bytesPerLine, linesPerThread);
-            }
-            else {
-                this->handleToCBlur(this->imageData + i * bytesPerLine * linesPerThread,
-                    this->blurredImageData + i * bytesPerLine * linesPerThread,
-                    bytesPerLine, linesPerThread);
-            }
+            //if (i == 1) {
+                if (!choice) {
+                    this->handleToAsmBlur(this->imageData + i * bytesPerLine * linesPerThread + 9,
+                        this->blurredImageData + i * bytesPerLine * linesPerThread,
+                        bytesPerLine, linesPerThread);
+                }
+                else {
+                    this->handleToCBlur(this->imageData + i * bytesPerLine * linesPerThread,
+                        this->blurredImageData + i * bytesPerLine * linesPerThread,
+                        bytesPerLine, linesPerThread);
+                }
+            //}
         }   ));
+      
     }
 
     if (startAdditionalThread) {
@@ -414,6 +417,11 @@ void BitmapManager::exportImage(const char * filename)
 long long BitmapManager::getLastRuntime()
 {
     return this->lastRuntime;
+}
+
+void  BitmapManager::test()
+{
+    return;
 }
 
 BitmapManager::~BitmapManager()
