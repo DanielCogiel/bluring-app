@@ -34,7 +34,7 @@ public:
 	void TestLoading(int threadNumber);
 	void exportImage(const char* filename);
 	long long getLastRuntime();
-	void test();
+	bool test(int threadNumber);
 	~BitmapManager();
 };
 

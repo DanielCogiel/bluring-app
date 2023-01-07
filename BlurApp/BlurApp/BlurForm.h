@@ -246,6 +246,16 @@ namespace BlurApp {
 #pragma endregion
 	private: System::Void blurButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (this->blurManager->isFileLoaded) {
+
+			/*bool result = this->blurManager->test(this->threadNumberTrackbar->Value);
+
+			if (result) {
+				this->funcInfoLabel->Text = "100% match.";
+			}
+			else {
+				this->funcInfoLabel->Text = "Is not the same.";
+			}*/
+
 			if (this->asmRadioButton->Checked)
 				this->blurManager->runBlur(this->threadNumberTrackbar->Value, false);
 			else

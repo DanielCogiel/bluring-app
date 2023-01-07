@@ -487,10 +487,35 @@ long long BitmapManager::getLastRuntime()
     return this->lastRuntime;
 }
 
-void BitmapManager::test(int threadNumber)
+bool BitmapManager::test(int threadNumber)
 {
+    bool result = true;
+    int c = 0;
+    unsigned char badMatchAsm = 0;
+    unsigned char badMatchC = 0;
+
     this->runBlur(threadNumber, false);
-    //unsigned char* cBlurredData;
+    auto dataSize = this->infoHeader.biSizeImage;
+    unsigned char* asmBlurredData = new unsigned char [dataSize];
+    std::copy(this->blurredImageData, this->blurredImageData + dataSize, asmBlurredData);
+    this->runBlur(threadNumber, true);
+    unsigned char* cBlurredData = new unsigned char[dataSize];
+    std::copy(this->blurredImageData, this->blurredImageData + dataSize, cBlurredData);
+    for (int i = 0; i < dataSize; i++) {
+        if (cBlurredData[i] != asmBlurredData[i]) {
+            result = false;
+            badMatchAsm = asmBlurredData[i];
+            badMatchC = cBlurredData[i];
+            c = 1;
+        }
+            
+    }
+
+    delete[] asmBlurredData;
+    delete[] cBlurredData;
+
+
+    return result;
 }
 
 BitmapManager::~BitmapManager()
