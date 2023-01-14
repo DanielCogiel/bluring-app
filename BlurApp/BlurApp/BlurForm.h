@@ -15,26 +15,23 @@ namespace BlurApp {
 
 
 	/// <summary>
-	/// Podsumowanie informacji o BlurForm
+	/// BlurForm info summary
 	/// </summary>
 	public ref class BlurForm : public System::Windows::Forms::Form
 	{
-		//Mened¿er bitmapy
+		//Bitmap manager
 		BitmapManager* blurManager;
 	public:
 		BlurForm(void)
 		{
 			InitializeComponent();
-			//
-			//TODO: W tym miejscu dodaj kod konstruktora
-			//
 			
 			this->blurManager = new BitmapManager();
 		}
 
 	protected:
 		/// <summary>
-		/// Wyczyœæ wszystkie u¿ywane zasoby.
+		/// Clear all resources.
 		/// </summary>
 		~BlurForm()
 		{
@@ -42,7 +39,6 @@ namespace BlurApp {
 			{
 				delete components;
 			}
-			
 		}
 	private: System::Windows::Forms::TrackBar^ threadNumberTrackbar;
 	protected:
@@ -70,14 +66,14 @@ namespace BlurApp {
 
 	private:
 		/// <summary>
-		/// Wymagana zmienna projektanta.
+		/// Required component model variable
 		/// </summary>
 		System::ComponentModel::Container ^components;
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
-		/// Metoda wymagana do obs³ugi projektanta — nie nale¿y modyfikowaæ
-		/// jej zawartoœci w edytorze kodu.
+		/// Method required to control component.
+		/// Do not modify.
 		/// </summary>
 		void InitializeComponent(void)
 		{
@@ -246,16 +242,6 @@ namespace BlurApp {
 #pragma endregion
 	private: System::Void blurButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (this->blurManager->isFileLoaded) {
-
-			/*bool result = this->blurManager->test(this->threadNumberTrackbar->Value);
-
-			if (result) {
-				this->funcInfoLabel->Text = "100% match.";
-			}
-			else {
-				this->funcInfoLabel->Text = "Is not the same.";
-			}*/
-
 			if (this->asmRadioButton->Checked)
 				this->blurManager->runBlur(this->threadNumberTrackbar->Value, false);
 			else
@@ -269,21 +255,13 @@ namespace BlurApp {
 				+ ".\nTime is " + this->blurManager->getLastRuntime() + " microseconds.";
 			this->blurManager->exportImage("output.bmp");
 			this->blurredImagePictureBox->ImageLocation = "output.bmp";
-			
 		}
-		
-		
-		//this->blurredImagePictureBox->Image = Image::FromFile("output.bmp");
 	}
 	
 	private: System::Void chooseImageButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (this->FileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
 			this->originalImagePictureBox->ImageLocation = this->FileDialog->FileName;
 			this->blurredImagePictureBox->Image = nullptr;
-			//const char* str = (const char*)(void*)
-			//	Marshal::StringToHGlobalAnsi(this->FileDialog->FileName->ToString());
-			// use str here for the ofstream filename
-			//Marshal::FreeHGlobal(str);
 
 			IntPtr tmpHandle = Marshal::StringToHGlobalAnsi(this->FileDialog->FileName->ToString());
 			const char* str = static_cast<char*> (tmpHandle.ToPointer());

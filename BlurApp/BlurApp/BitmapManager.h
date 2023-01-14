@@ -15,11 +15,17 @@ class BitmapManager {
 public:
 	BitmapFileHeader fileHeader;
 	BitmapInfoHeader infoHeader;
+	//original image pointer
 	unsigned char* imageData;
+	//blurred image pointer 
 	unsigned char* blurredImageData;
+	//C++ DLL handle
 	HINSTANCE hinstLibC;
+	//ASM DLL handle
 	HINSTANCE hinstLibAsm;
+	//C++ procedure handle
 	MYPROC handleToCBlur;
+	//ASM procedure handle
 	ASM_PROC handleToAsmBlur;
 	long long lastRuntime;
 
@@ -28,12 +34,9 @@ public:
 	bool isFileLoaded;
 	void loadBMP(const char* filename);
 	BitmapManager();
-	void printBytes(int numberOfBytes, bool choice);
 	void runBlur(int threadNumber, bool choice);
-	void TestLoading(int threadNumber);
 	void exportImage(const char* filename);
 	long long getLastRuntime();
-	bool test(int threadNumber);
 	~BitmapManager();
 };
 
