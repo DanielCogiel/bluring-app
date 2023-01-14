@@ -11,15 +11,15 @@ void BlurProc(unsigned char* origImage, unsigned char* blurredImage,
             + origImage[i + 3] + origImage[i + 6]) * 3 + 3) >> 4;
     }*/
 
-    int offset = 9;
+    
     for (int i = 0; i < linesToProcess; i++)
         for (int j = 0; j < bytesPerLine; j++)
         {
-            blurredImage[j + i * bytesPerLine] = ((origImage[j + i * bytesPerLine - 6 + offset] +
-                origImage[j + i * bytesPerLine - 3 + offset] + 
-                origImage[j + i * bytesPerLine - 6 + offset] + 
-                origImage[j + i * bytesPerLine + 3 + offset] +
-                origImage[j + i * bytesPerLine + 6 + offset]) * 3 + 3) >> 4;
+            blurredImage[j + i * bytesPerLine] = ((origImage[j + i * bytesPerLine - 6 + 9] +
+                origImage[j + i * bytesPerLine - 3 + 9] + 
+                origImage[j + i * bytesPerLine - 6 + 9] + 
+                origImage[j + i * bytesPerLine + 3 + 9] +
+                origImage[j + i * bytesPerLine + 6 + 9]) * 3 + 3) >> 4;
         }
 
 

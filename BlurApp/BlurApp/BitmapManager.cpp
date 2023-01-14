@@ -71,33 +71,6 @@ BitmapManager::BitmapManager()
    
 }
 
-void BitmapManager::printImageOnConsole()
-{
-    //Oblicz, ile bajtów w jednym rzêdzie
-    auto bytesPerRow = this->infoHeader.biSizeImage / this->infoHeader.biHeight;
-    std::cout << "Bytes in row: " << bytesPerRow << std::endl;
-
-    auto start = std::chrono::high_resolution_clock::now();
-
-    //Wypisz ca³y obraz
-    for (int y = 0; y < this->infoHeader.biSizeImage; y += bytesPerRow) {
-        for (int x = 0; x < bytesPerRow; x++) {
-            std::cout << std::setw(3) << float(*(this->imageData + x));
-            std::cout << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    auto finish = std::chrono::high_resolution_clock::now();
-
-    std::chrono::duration<double> duration = finish - start;
-
-    //Wypisz w konsoli czas wyœwietlania obrazu
-    std::cout << "========================================================" << std::endl;
-    std::cout << "Displaying image on the screen took " << duration.count() << " seconds." << std::endl;
-    std::cout << "========================================================" << std::endl;
-}
-
 void BitmapManager::printBytes(int numberOfBytes, bool choice)
 {
     std::cout << "First " << numberOfBytes << " bytes:" << std::endl;
@@ -124,10 +97,6 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
     int bytesPerLine = this->infoHeader.biSizeImage / this->infoHeader.biHeight;
     int linesPerThread = this->infoHeader.biHeight / threadNumber;
     int additionalLines = this->infoHeader.biHeight % threadNumber;
-    bool startAdditionalThread = false;
-
-    if (additionalLines > 0)
-        startAdditionalThread = true;
 
     std::chrono::steady_clock::time_point start;
     if (!choice) {
@@ -135,35 +104,18 @@ void BitmapManager::runBlur(int threadNumber, bool choice)
 
         for (int i = 0; i < additionalLines; i++) {
             threads.push_back(std::thread(this->handleToAsmBlur,
-                this->imageData + i * bytesPerLine * (linesPerThread + 1) + 9,
+                this->imageData + i * bytesPerLine * (linesPerThread + 1),
                 this->blurredImageData + i * bytesPerLine * (linesPerThread + 1),
                 bytesPerLine, linesPerThread + 1));
         }
         for (int i = 0; i < threadNumber - additionalLines; i++) {
             threads.push_back(std::thread(this->handleToAsmBlur,
-                this->imageData + additionalLines * bytesPerLine * (linesPerThread + 1) + 9 + 
+                this->imageData + additionalLines * bytesPerLine * (linesPerThread + 1) + 
             i * bytesPerLine * linesPerThread,
                 this->blurredImageData + additionalLines * bytesPerLine * (linesPerThread + 1) + 
             i * bytesPerLine * linesPerThread,
                 bytesPerLine, linesPerThread));
         }
-
-        /*for (int i = 0; i < threadNumber; i++) {
-            
-
-
-            threads.push_back(std::thread(this->handleToAsmBlur,
-                this->imageData + i * bytesPerLine * linesPerThread + 9,
-                this->blurredImageData + i * bytesPerLine * linesPerThread,
-                bytesPerLine, linesPerThread));
-        }
-
-        if (startAdditionalThread) {
-            threads.push_back(std::thread(this->handleToAsmBlur,
-                this->imageData + threadNumber * bytesPerLine * linesPerThread + 9,
-                this->blurredImageData + threadNumber * bytesPerLine * linesPerThread,
-                bytesPerLine, additionalLines));
-        }*/
     }
     else {
         start = std::chrono::high_resolution_clock::now();

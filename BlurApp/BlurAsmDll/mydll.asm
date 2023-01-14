@@ -24,6 +24,7 @@ myVar db 0, 4, 8, 12, 12 dup (-1)
 ;############################################################################################
 
 BlurProc proc 
+	add rcx, 9							;set proper starting point for original image pointer
 	mov r14, rcx						;move original image pointer to r14
 	mov r15, rdx						;move blurred image pointer to r15
 	mov r10, r8							;set horizontal counter to bytesPerLine value 

@@ -28,7 +28,6 @@ public:
 	bool isFileLoaded;
 	void loadBMP(const char* filename);
 	BitmapManager();
-	void printImageOnConsole();
 	void printBytes(int numberOfBytes, bool choice);
 	void runBlur(int threadNumber, bool choice);
 	void TestLoading(int threadNumber);
