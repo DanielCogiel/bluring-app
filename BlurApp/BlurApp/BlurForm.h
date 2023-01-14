@@ -254,7 +254,7 @@ namespace BlurApp {
 				+ (this->threadNumberTrackbar->Value == 1 ? " thread" : " threads")
 				+ ".\nTime is " + this->blurManager->getLastRuntime() + " microseconds.";
 			this->blurManager->exportImage("output.bmp");
-			this->blurredImagePictureBox->ImageLocation = "output.bmp";
+			this->blurredImagePictureBox->ImageLocation = "output.bmp";	
 		}
 	}
 	

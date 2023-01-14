@@ -36,6 +36,7 @@ public:
 	BitmapManager();
 	void runBlur(int threadNumber, bool choice);
 	void exportImage(const char* filename);
+	void runSpeedTests(const char* filename);
 	long long getLastRuntime();
 	~BitmapManager();
 };

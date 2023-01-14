@@ -141,6 +141,38 @@ void BitmapManager::exportImage(const char * filename)
     fclose(outputFile);
 }
 
+void BitmapManager::runSpeedTests(const char* filename)
+{
+    FILE* fpt;
+    fpt = fopen("tests.csv", "w+");
+    this->loadBMP(filename);
+
+    this->runBlur(1, false);
+
+    std::vector<int> threadNumbers = { 1, 2, 4, 8, 16, 32, 64 };
+
+    fprintf(fpt, filename);
+    fprintf(fpt, "\n");
+    for (int i : threadNumbers) {
+        fprintf(fpt, "ASM (%d);", i);
+        for (int j = 0; j < 20; j++) {
+            this->runBlur(i, false);
+            fprintf(fpt, "%lld;", this->getLastRuntime());
+        }
+        fprintf(fpt, "\n");
+    }
+    for (int i : threadNumbers) {
+        fprintf(fpt, "C++ (%d);", i);
+        for (int j = 0; j < 20; j++) {
+            this->runBlur(i, true);
+            fprintf(fpt, "%lld;", this->getLastRuntime());
+        }
+        fprintf(fpt, "\n");
+    }
+
+    fclose(fpt);
+}
+
 long long BitmapManager::getLastRuntime()
 {
     return this->lastRuntime;
